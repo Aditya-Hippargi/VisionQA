@@ -1,0 +1,17 @@
+# Core Dependencies
+python-dotenv          # Load environment variables from .env
+google-generativeai    # Gemini API client
+playwright            # Browser automation and video recording
+
+# HTML Report Generation
+Jinja2                 # Template engine for HTML reports
+MarkupSafe             # Required by Jinja2
+
+# Utilities
+requests              # HTTP requests (if needed for API calls)
+pillow                # Image processing (for screenshots)
+
+# Development (optional but recommended)
+pytest                 # Testing framework
+black                # Code formatting
+flake8                 # Linting
