@@ -18,7 +18,7 @@ load_dotenv()
 MODEL_FALLBACK_CHAIN = [
     "gemini-1.5-flash",          # Best for JSON structure & strict instructions
     "gemini-2.0-flash",          # Good backup
-    "gemini-2.5-flash-lite",     # Fast but sometimes ignores complex instructions
+    "gemini-3-flash-preview",     # Fast but sometimes ignores complex instructions
 ]
 
 class GeminiAnalyst:
