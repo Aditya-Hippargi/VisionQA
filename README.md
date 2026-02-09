@@ -72,14 +72,14 @@ The tool will:
 
 ```
 VisionQA/
-├── .env                    # API keys (DO NOT COMMIT)
+├── .env                    # API keys 
 ├── .gitignore              # Git ignore rules
-├── README.md               # This file
+├── README.md               
 ├── requirements.txt        # Python dependencies
 ├── main.py                 # Entry point
 ├── agents/
 │   ├── browser.py          # Playwright automation
-│   └── analyst.py          # Gemini analysis
+│   └── analyst.py          # Gemini3 analysis
 ├── utils/
 │   └── reporter.py         # HTML report generator
 ├── output/                 # Generated files
