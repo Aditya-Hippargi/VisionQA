@@ -1,6 +1,6 @@
 """
-VisionQA Browser Agent (Stealth Version - Fixed)
-Uses manual stealth script injection to avoid import errors.
+VisionQA Browser Agent 
+It Uses manual stealth script injection to avoid import errors.
 """
 
 import asyncio
@@ -10,11 +10,11 @@ import random
 from datetime import datetime
 from pathlib import Path
 
-# Try to import Playwright
+# Import Playwright
 try:
     from playwright.async_api import async_playwright, Page
 except ImportError:
-    print("❌ Critical Import Error. Run: pip install playwright")
+    print(" Critical Import Error. Run: pip install playwright")
     exit(1)
 
 # --- CONFIGURATION ---
@@ -32,7 +32,6 @@ class BrowserRecorder:
     async def _apply_stealth(self, page: Page):
         """
         Manually injects stealth scripts to hide automation flags.
-        This fixes the 'ImportError' by not relying on the external library function.
         """
         # 1. Mask the webdriver property
         await page.add_init_script("""
@@ -75,7 +74,7 @@ class BrowserRecorder:
 
     async def _handle_popups(self, page: Page):
         """Handles Cookies AND Amazon-style 'Continue' barriers."""
-        print("   🛡️  Checking for popups/barriers...")
+        print("     Checking for popups/barriers...")
         
         # 1. Generic Cookie Buttons
         cookie_texts = ["Accept", "Accept All", "Allow", "I Agree", "Got it", "Consent"]
@@ -92,13 +91,13 @@ class BrowserRecorder:
         try:
             amazon_btn = page.get_by_text("Continue shopping", exact=False)
             if await amazon_btn.count() > 0 and await amazon_btn.is_visible():
-                 print("      ↳ ⚠️ Detected Amazon Block. Attempting to click through...")
+                 print("      ↳  Detected Amazon Block. Attempting to click through...")
                  await amazon_btn.first.click()
                  await page.wait_for_timeout(2000)
         except: pass
 
     async def _smooth_scroll(self, page: Page):
-        print("   📜 Starting smooth scroll...")
+        print("    Starting smooth scroll...")
         total_height = await page.evaluate("document.body.scrollHeight")
         viewport_height = VIEWPORT_SIZE["height"]
         steps = 40
@@ -149,7 +148,7 @@ class BrowserRecorder:
                 # ACTIVATE MANUAL STEALTH
                 await self._apply_stealth(page)
                 
-                print("   🌐 Navigating (Stealth Mode ON)...")
+                print("    Navigating (Stealth Mode ON)...")
                 await page.goto(url, wait_until="domcontentloaded", timeout=45000)
                 
                 await page.wait_for_timeout(3000)
@@ -157,7 +156,7 @@ class BrowserRecorder:
                 await self._human_mouse_move(page)
                 await self._smooth_scroll(page)
 
-                print("   💾 Saving video...")
+                print("    Saving video...")
                 await context.close()
                 await browser.close()
                 
@@ -168,11 +167,11 @@ class BrowserRecorder:
                 shutil.move(str(latest_video), str(final_path))
                 shutil.rmtree(self.temp_dir, ignore_errors=True)
                 
-                print(f"   ✅ Recording Complete: {final_path}")
+                print(f"    Recording Complete: {final_path}")
                 return str(final_path)
 
             except Exception as e:
-                print(f"   ❌ Browser Error: {e}")
+                print(f"    Browser Error: {e}")
                 await context.close()
                 await browser.close()
                 return None

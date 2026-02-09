@@ -14,11 +14,10 @@ from google.genai import types
 
 load_dotenv()
 
-# --- CORRECT MODEL NAMES (as of January 2026) ---
 MODEL_FALLBACK_CHAIN = [
-    "gemini-1.5-flash",          # Best for JSON structure & strict instructions
-    "gemini-2.0-flash",          # Good backup
-    "gemini-3-flash-preview",     # Fast but sometimes ignores complex instructions
+    "gemini-1.5-flash",          
+    "gemini-2.0-flash",          
+    "gemini-3-flash-preview",     
 ]
 
 class GeminiAnalyst:
@@ -26,9 +25,9 @@ class GeminiAnalyst:
     def __init__(self, api_key=None):
         self.api_key = api_key or os.getenv('GEMINI_API_KEY')
         if not self.api_key:
-            raise ValueError("❌ GEMINI_API_KEY not found in .env file")
+            raise ValueError(" GEMINI_API_KEY not found in .env file")
         
-        # Set a long timeout to prevent "503 Overloaded" on client side
+        # Timeout to prevent "503 Overloaded" on client side
         self.client = genai.Client(
             api_key=self.api_key,
             http_options={'timeout': 600000}  # 10 minutes
@@ -36,7 +35,7 @@ class GeminiAnalyst:
     
     def upload_video(self, video_path):
         video_path = Path(video_path)
-        print(f"📤 Uploading: {video_path.name}...")
+        print(f" Uploading: {video_path.name}...")
         
         uploaded_file = self.client.files.upload(file=str(video_path))
         
@@ -46,12 +45,12 @@ class GeminiAnalyst:
             uploaded_file = self.client.files.get(name=uploaded_file.name)
 
         if uploaded_file.state.name == "FAILED":
-            raise Exception("❌ Video processing failed.")
+            raise Exception(" Video processing failed.")
 
-        print(f"\n✅ Video Active: {uploaded_file.name}")
+        print(f"\n Video Active: {uploaded_file.name}")
         
-        # CRITICAL: Wait for file propagation across Google's regions
-        print("⏳ Letting file propagate (10s)...")
+        # Wait for file propagation across Google's regions
+        print(" Letting file propagate (10s)...")
         time.sleep(10) 
         
         return uploaded_file
@@ -60,9 +59,8 @@ class GeminiAnalyst:
         """
         Analyzes video with aggressive backoff and STRICT JSON enforcement
         """
-        print(f"🔍 Analyzing video content...")
+        print(f" Analyzing video content...")
         
-        # --- THE BRUTAL PROMPT ---
         prompt = """
         You are a strict UI/UX Lead Auditor. Your job is to critique the user interface in this video.
         Do NOT just look for functional crashes. Look for VISUAL CLUTTER, BAD ALIGNMENT, and DATED DESIGN.
@@ -94,7 +92,7 @@ class GeminiAnalyst:
                 print(f"   Attempting with {model_name}...")
                 
                 # FORCE JSON MODE
-                # This config tells Gemini: "Output ONLY JSON. No Markdown."
+                # Output ONLY JSON. No Markdown."
                 response = self.client.models.generate_content(
                     model=model_name,
                     contents=[
@@ -106,15 +104,15 @@ class GeminiAnalyst:
                     ],
                     config=types.GenerateContentConfig(
                         temperature=0.2,
-                        response_mime_type="application/json"  # <--- THE MAGIC FIX
+                        response_mime_type="application/json"  
                     )
                 )
-                print(f"   ✅ Success with {model_name}!")
+                print(f"    Success with {model_name}!")
                 return response.text
                 
             except Exception as e:
                 error_msg = str(e)
-                print(f"   ⚠️ {model_name} failed.")
+                print(f"    {model_name} failed.")
                 
                 # Handle Rate Limits (429)
                 if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
@@ -128,7 +126,7 @@ class GeminiAnalyst:
                 
                 # If last model, crash
                 if i == len(MODEL_FALLBACK_CHAIN) - 1:
-                    raise Exception(f"❌ All models failed. Last error: {error_msg}")
+                    raise Exception(f" All models failed. Last error: {error_msg}")
                 
                 print("      ↳ Switching to next model...")
                 continue
@@ -159,15 +157,15 @@ def main():
         data = json.loads(clean_json)
         
         print("\n" + "=" * 70)
-        print("📊 VISIONQA ANALYSIS REPORT")
+        print(" VISIONQA ANALYSIS REPORT")
         print("=" * 70)
         
-        print(f"\n📄 Description: {data.get('description', 'N/A')}")
-        print(f"⭐ UX Score: {data.get('ux_score', '?')}/10")
+        print(f"\n Description: {data.get('description', 'N/A')}")
+        print(f" UX Score: {data.get('ux_score', '?')}/10")
         
         # NOTE: We look for 'issues' now, matching the new prompt
         issues = data.get('issues', [])
-        print(f"\n🐛 Issues Found: {len(issues)}")
+        print(f"\n Issues Found: {len(issues)}")
         
         if issues:
             # Sort by severity (High first)
@@ -182,7 +180,7 @@ def main():
                 print(f"      Timestamp: {issue.get('timestamp', 'N/A')}")
                 print(f"      ↳ {issue.get('details', '')}")
         else:
-            print("\n   ✅ No issues detected. (If this is Arngren.net, something is wrong!)")
+            print("\n    No issues detected. (If this is Arngren.net, something is wrong!)")
         
         print("\n" + "=" * 70)
         
@@ -190,10 +188,10 @@ def main():
         output_file = Path(video_path).stem + "_qa_report.json"
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
-        print(f"💾 Saved to: {output_file}")
+        print(f" Saved to: {output_file}")
         
     except Exception as e:
-        print(f"\n❌ CRITICAL ERROR: {e}")
+        print(f"\n CRITICAL ERROR: {e}")
         import traceback
         traceback.print_exc()
 
